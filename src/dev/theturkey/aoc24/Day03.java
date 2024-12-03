@@ -14,9 +14,9 @@ public class Day03 extends AOCPuzzle
 	{
 		int sum = 0;
 		int sum2 = 0;
+		boolean ignore = false;
 		for(String l : input)
 		{
-			boolean ignore = false;
 			for(int i = 0; i < l.length(); i++)
 			{
 				if(l.charAt(i) == 'm' || l.charAt(i) == 'd')
