@@ -6,6 +6,7 @@ public class AoC2024Core
 	{
 //		new Day01();
 //		new Day02();
-		new Day03();
+//		new Day03();
+		new Day04();
 	}
 }
