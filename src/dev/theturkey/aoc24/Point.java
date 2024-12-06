@@ -28,4 +28,15 @@ public record Point(int row, int col)
 	{
 		return Objects.hash(row, col);
 	}
+
+	public Point directionOffset(Direction direction)
+	{
+		return switch(direction)
+		{
+			case UP -> new Point(row - 1, col);
+			case RIGHT -> new Point(row, col + 1);
+			case DOWN -> new Point(row + 1, col);
+			case LEFT -> new Point(row, col - 1);
+		};
+	}
 }
