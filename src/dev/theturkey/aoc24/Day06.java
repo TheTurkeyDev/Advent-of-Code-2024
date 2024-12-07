@@ -12,7 +12,7 @@ public class Day06 extends AOCPuzzle
 		super("6");
 	}
 
-	private boolean isCycle(char[][] map, Direction dir, Point guardLoc, Point startLoc)
+	private boolean isCycle(char[][] map, Direction dir, Point guardLoc)
 	{
 		Set<PointDirection> visited = new HashSet<>();
 		while(true)
@@ -36,7 +36,6 @@ public class Day06 extends AOCPuzzle
 	public void solve(List<String> input)
 	{
 		Direction dir = Direction.UP;
-		Point startPoint = new Point(0, 0);
 		Point guardLoc = new Point(0, 0);
 		char[][] map = new char[input.size()][input.get(0).length()];
 
@@ -48,7 +47,7 @@ public class Day06 extends AOCPuzzle
 				char c = rowStr.charAt(col);
 				map[row][col] = c;
 				if(c == '^')
-					guardLoc = startPoint = new Point(row, col);
+					guardLoc = new Point(row, col);
 			}
 		}
 
@@ -75,7 +74,7 @@ public class Day06 extends AOCPuzzle
 				for(int i = 0; i < map.length; i++)
 					mapClone[i] = map[i].clone();
 				mapClone[or][oc] = '#';
-				if(isCycle(mapClone, dir, guardLoc, startPoint))
+				if(isCycle(mapClone, dir, guardLoc))
 					obstructionPos.add(obstruction);
 			}
 		}
