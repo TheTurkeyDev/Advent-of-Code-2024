@@ -39,4 +39,9 @@ public record Point(int row, int col)
 			case LEFT -> new Point(row, col - 1);
 		};
 	}
+
+	public boolean within(int width, int height)
+	{
+		return row >= 0 && row < height && col >= 0 && col < width;
+	}
 }
