@@ -15,26 +15,24 @@ public class Day14 extends AOCPuzzle
 		super("14");
 	}
 
-	public void moveRobotsXTimes(List<Robot> robots, int times)
+	public void moveRobotXTimes(Robot robot, int times)
 	{
-		for(Robot robot : robots)
-		{
-			Point np = robot.pos.add(robot.vel.mul(times));
-			int newX = np.col() % width;
-			if(newX < 0)
-				newX += width;
-			int newY = np.row() % height;
-			if(newY < 0)
-				newY += height;
+		Point np = robot.pos.add(robot.vel.mul(times));
+		int newX = np.col() % width;
+		if(newX < 0)
+			newX += width;
+		int newY = np.row() % height;
+		if(newY < 0)
+			newY += height;
 
-			robot.pos = new Point(newY, newX);
-		}
+		robot.pos = new Point(newY, newX);
 	}
 
 	@Override
 	public void solve(List<String> input)
 	{
 		List<Robot> robots = new ArrayList<>();
+		List<Robot> robots2 = new ArrayList<>();
 		for(String line : input)
 		{
 			String[] parts = line.split(" ");
@@ -43,9 +41,11 @@ public class Day14 extends AOCPuzzle
 			Point pos = new Point(Integer.parseInt(posParts[1]), Integer.parseInt(posParts[0]));
 			Point vel = new Point(Integer.parseInt(velParts[1]), Integer.parseInt(velParts[0]));
 			robots.add(new Robot(pos, vel));
+			robots2.add(new Robot(pos, vel));
 		}
 
-		moveRobotsXTimes(robots, 100);
+		for(Robot robot : robots)
+			moveRobotXTimes(robot, 100);
 
 		int[] quads = new int[4];
 		for(Robot robot : robots)
@@ -65,6 +65,17 @@ public class Day14 extends AOCPuzzle
 		}
 
 		lap(quads[0] * quads[1] * quads[2] * quads[3]);
+
+		Robot r = robots2.get(0);
+		Point start = r.pos;
+		int loop = 0;
+		do
+		{
+			moveRobotXTimes(r, 1);
+			loop++;
+		} while(!r.pos.equals(start));
+
+		lap(loop);//Not the actual answer, just how long till it loops back to the beginning
 	}
 
 	public static class Robot
