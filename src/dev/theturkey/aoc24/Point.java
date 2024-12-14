@@ -44,4 +44,14 @@ public record Point(int row, int col)
 	{
 		return row >= 0 && row < height && col >= 0 && col < width;
 	}
+
+	public Point add(Point p)
+	{
+		return new Point(row + p.row, col + p.col);
+	}
+
+	public Point mul(int times)
+	{
+		return new Point(row * times, col * times);
+	}
 }
