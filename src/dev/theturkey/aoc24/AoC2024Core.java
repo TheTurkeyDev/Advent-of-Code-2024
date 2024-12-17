@@ -19,6 +19,7 @@ public class AoC2024Core
 //		new Day13();
 //		new Day14();
 //		new Day15();
-		new Day16();
+//		new Day16();
+		new Day17();
 	}
 }
