@@ -1,105 +1,110 @@
 package dev.theturkey.aoc24;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class Day21 extends AOCPuzzle {
+public class Day21 extends AOCPuzzle
+{
 
-    private static final char[][] keypad = {
-            {'7', '8', '9'},
-            {'4', '5', '6'},
-            {'1', '2', '3'},
-            {' ', '0', 'A'}
-    };
+	private static final char[][] keypad = {
+			{'7', '8', '9'},
+			{'4', '5', '6'},
+			{'1', '2', '3'},
+			{' ', '0', 'A'}
+	};
 
-    private static final char[][] controller = {
-            {' ', '^', 'A'},
-            {'<', 'v', '>'}
-    };
+	private static final char[][] controller = {
+			{' ', '^', 'A'},
+			{'<', 'v', '>'}
+	};
 
-    public Day21() {
-        super("21");
-    }
+	public Day21()
+	{
+		super("21");
+	}
 
-    @Override
-    void solve(List<String> input) {
-        long answer = 0;
-        for (String inp : input) {
-            StringBuilder answer1 = new StringBuilder();
-            StringBuilder answer2 = new StringBuilder();
-            StringBuilder answer3 = new StringBuilder();
-            Point[] robots = {
-                    new Point(3, 2),
-                    new Point(0, 2),
-                    new Point(0, 2)
-            };
-            for (char c : inp.toCharArray()) {
-                ReturnInfo afterMove = getMovesForKeyPadBtn(robots[0], c, 2);
+	@Override
+	void solve(List<String> input)
+	{
+		long part1 = 0;
+		long part2 = 0;
+		for(String inp : input)
+		{
+			long num = Long.parseLong(inp.substring(0, inp.length() - 1));
+			part1 += num * getFinalCountForXRobots(inp, 3, 3);
+			part2 += num * getFinalCountForXRobots(inp, 26, 26);
+		}
+		lap(part1);
+		lap(part2);
+	}
 
-            }
+	private static final Map<String, Long> cache = new HashMap<>();
 
-            long num = Long.parseLong(inp.substring(0, inp.length() - 1));
-            answer += num * answer3.length();
-            System.out.println(inp + ": " + num + "*" + answer3.length() + " | " + answer3);
-        }
-        lap(answer);
-    }
+	private long getFinalCountForXRobots(String str, int depthToGo, int numLevels)
+	{
+		if(depthToGo == 0 || str.equals("A"))
+			return str.length();
 
-    //281260 High
-    //v<<A>>^AvA^Av<<A>>^AA<vA<A>>^AAvAA<^A>A<vA>^AA<A>Av<<A>A>^AAAvA<^A>A
-    //<v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A
+		String key = str + "-" + depthToGo;
+		if(cache.containsKey(key))
+			return cache.get(key);
 
-    private ReturnInfo getMovesForKeyPadBtn(Point p, char b, int depth) {
-        char[][] keys = depth == 3 ? keypad : controller;
-        Point dest = new Point(-1, -1);
-        for (int row = 0; row < keys.length; row++) {
-            for (int col = 0; col < keys[0].length; col++) {
-                if (keys[row][col] == b)
-                    dest = new Point(row, col);
-            }
-        }
+		long total = 0;
+		for(String ss : str.split("(?<=A)")) // Look-ahead so that we keep the A
+		{
+			Point p = depthToGo == numLevels ? new Point(3, 2) : new Point(0, 2);
+			StringBuilder finalStr = new StringBuilder();
+			for(char c : ss.toCharArray())
+			{
+				ReturnInfo afterMove = getMovesForKeyPadBtn(p, c, depthToGo == numLevels);
+				finalStr.append(afterMove.buttonsPressed);
+				p = afterMove.p;
+			}
+			total += getFinalCountForXRobots(finalStr.toString(), depthToGo - 1, numLevels);
+		}
+		cache.put(key, total);
+		return total;
+	}
 
-        int colDiff = p.col() - dest.col();
-        int rowDiff = p.row() - dest.row();
-        String udBtns = (rowDiff > 0 ? "^" : "v").repeat(Math.abs(rowDiff));
-        String lrBtns = (colDiff > 0 ? "<" : ">").repeat(Math.abs(colDiff));
+	private ReturnInfo getMovesForKeyPadBtn(Point p, char b, boolean useKeyPad)
+	{
+		char[][] keys = useKeyPad ? keypad : controller;
+		Point dest = new Point(-1, -1);
+		for(int row = 0; row < keys.length; row++)
+		{
+			for(int col = 0; col < keys[0].length; col++)
+			{
+				if(keys[row][col] == b)
+					dest = new Point(row, col);
+			}
+		}
 
-        if (depth == 0)
-            return new ReturnInfo(dest, udBtns + lrBtns + "A");
+		int colDiff = dest.col() - p.col();
+		int rowDiff = dest.row() - p.row();
+		String udBtns = (rowDiff < 0 ? "^" : "v").repeat(Math.abs(rowDiff));
+		String lrBtns = (colDiff < 0 ? "<" : ">").repeat(Math.abs(colDiff));
 
-        List<ReturnInfo> shortestReturns = new ArrayList<>();
-        for (String s : permutation(udBtns + lrBtns)) {
-            for (char c : (s + "A").toCharArray()) {
-                ReturnInfo ri = getMovesForKeyPadBtn(p, c, depth - 1);
-            }
-        }
 
-        shortestReturns.stream().min((ri, ri1) -> ri1.buttonsPressed.length() - ri.buttonsPressed.length()).get();
+		String path;
+		if(useKeyPad && p.row() == 3 && dest.col() == 0)
+			path = udBtns + lrBtns + "A";
+		else if(useKeyPad && p.col() == 0 && dest.row() == 3)
+			path = lrBtns + udBtns + "A";
+		else if(!useKeyPad && p.col() == 0)
+			path = lrBtns + udBtns + "A";
+		else if(!useKeyPad && dest.col() == 0)
+			path = udBtns + lrBtns + "A";
+		else if(colDiff < 0)
+			path = lrBtns + udBtns + "A";
+		else
+			path = udBtns + lrBtns + "A";
 
-        return null;
-    }
+		return new ReturnInfo(dest, path);
+	}
 
-    private Set<String> permutation(String s) {
-        if (s.length() == 1) {
-            Set<String> res = new HashSet<>();
-            res.add(s);
-            return res;
-        }
+	private record ReturnInfo(Point p, String buttonsPressed)
+	{
 
-        int lastIndex = s.length() - 1;
-        String last = s.substring(lastIndex);
-        String rest = s.substring(0, lastIndex);
-        return merge(permutation(rest), last);
-    }
-
-    private Set<String> merge(Set<String> list, String c) {
-        Set<String> res = new HashSet<>();
-        for (String s : list)
-            for (int i = 0; i <= s.length(); ++i)
-                res.add(new StringBuffer(s).insert(i, c).toString());
-        return res;
-    }
-
-    private record ReturnInfo(Point p, String buttonsPressed) {
-
-    }
+	}
 }
