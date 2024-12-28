@@ -77,12 +77,12 @@ public class Day16 extends AOCPuzzle
 		lap(points.size() + 1);
 	}
 
-	public record PossiblePath(Point p, Direction facing, int score, Set<Point> path)
+	private record PossiblePath(Point p, Direction facing, int score, Set<Point> path)
 	{
 
 	}
 
-	public record DirectedPoint(Point p, Direction facing)
+	private record DirectedPoint(Point p, Direction facing)
 	{
 		@Override
 		public boolean equals(Object o)
