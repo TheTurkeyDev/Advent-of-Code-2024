@@ -10,6 +10,7 @@ import java.util.List;
 
 public abstract class AOCPuzzle
 {
+	public static boolean showAnswers = true;
 	private int part = 1;
 	private long timerStart;
 
@@ -68,7 +69,7 @@ public abstract class AOCPuzzle
 	public void lap(String answer)
 	{
 		long timeSpent = (System.nanoTime() - timerStart) / 1000;
-		System.out.println("Part " + part + ": " + answer + ", Duration: " + timeToString(timeSpent));
+		System.out.println("Part " + part + ": " + (showAnswers ? answer : "[Redacted]") + ", Duration: " + timeToString(timeSpent));
 		timerStart = System.nanoTime();
 		part++;
 	}
